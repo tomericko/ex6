@@ -6,6 +6,8 @@
  */
 
 #include "MoviesSystem.h"
+
+MoviesSystem* MoviesSystem::instance = NULL;
 /*******************************************************************************
  * function name : ~MoviesSystem										       *
  * input : nothing														       *
@@ -27,6 +29,8 @@ MoviesSystem::~MoviesSystem() {
 	}
 }
 
+
+
 /*******************************************************************************
  * function name : MoviesSystem											       *
  * input : nothing.														       *
@@ -35,13 +39,44 @@ MoviesSystem::~MoviesSystem() {
  *				movies and vector of professionals.						       *
  *******************************************************************************/
 
-MoviesSystem::MoviesSystem(Server* server) {
+MoviesSystem::MoviesSystem() {
 	this->movies = vector<Movie*>();
 	this->professionals = vector<Professional*>();
 	this->types = vector<Type*>();
-	this->server = server;
+	this->inUse = false;
+	this->isConstruct = false;
+	//this->server = server;
 }
 
+static MoviesSystem& MoviesSystem::getInstance(){
+	if(!this->isConstruct){
+
+		/*if(pthread_mutex_init(&this->lock,NULL)!=0){
+			perror("couldn't initialize lock");
+		}*/
+		//lock
+		if(!this->isConstruct){
+			MoviesSystem::instance = new MoviesSystem();
+			this->isConstruct = true;
+		}
+		//unlock
+
+	}
+
+	return this->instance;
+}
+
+bool MoviesSystem::occupy(){
+	if(!this->inUse){
+		this->inUse = true;
+		return true;
+	}
+	return false;
+}
+
+void MoviesSystem::setServer(Server* serv){
+		this->server = serv;
+	}
 /*******************************************************************************
  * function name : start												       *
  * input : nothing.														       *

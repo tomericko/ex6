@@ -30,6 +30,7 @@ protected:
 	int sock;
 	char* dataReceived;
 	char* ip;
+	vector<pthread_t> threads;
 public:
 
 	/*******************************************************************************

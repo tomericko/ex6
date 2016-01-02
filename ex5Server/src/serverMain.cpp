@@ -15,8 +15,11 @@
 #include "TCPServer.h"
 
 using namespace std;
+
+MoviesSystem* ms = NULL;
+
 int main(int argc, char* argv[]) {
-	Server* server;
+	TCPServer* server;
 
 	if(argc-1!= 2){
 		cout<<"Missing arguments - exit"<<endl;
@@ -31,21 +34,19 @@ int main(int argc, char* argv[]) {
 	}
 
 	// creating a connection.
-	switch(type){
-	case 0:
-		server = new TCPServer(port);
-		break;
-	case 1:
-		server = new UDPServer(port);
-		break;
-	default:
-		cout<<"wrong connection type - exit"<<endl;
-		return 0;
+
+	server = new TCPServer(port);
+	while(true){
+		server->connEstablish();
+
+		pthread_create();
 	}
 
 
+
 	//starting the movies system.
-	MoviesSystem* ms = new MoviesSystem(server);
-	(*ms).start();
+
+	ms->setServer(server);
+	ms->getInstance().start();
 	return 0;
 }

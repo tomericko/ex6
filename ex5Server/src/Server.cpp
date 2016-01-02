@@ -13,6 +13,7 @@ Server::Server(){
 	this->dataReceived =NULL;
 	this->sock = 0;
 	this->ip = NULL;
+	this->threads = NULL;
 }
 
 /*******************************************************************************

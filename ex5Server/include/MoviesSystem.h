@@ -30,6 +30,10 @@ private:
 	vector<Professional*> professionals;
 	vector<Type*> types;
 	Server* server;
+	static MoviesSystem* instance;
+	static pthread_mutex_t lock;
+	bool inUse;
+	static bool isConstruct;
 
 	/*******************************************************************************
 	 * function name : getCommand											       *
@@ -70,7 +74,6 @@ private:
 	 * explanation : check if the input of the sortingType is valid.		       *
 	 *******************************************************************************/
 	bool isSortingTypeValid(int sortingType);
-public:
 	/*******************************************************************************
 	 * function name : MoviesSystem											       *
 	 * input : nothing.														       *
@@ -78,8 +81,13 @@ public:
 	 * explanation : constructor of moviesSystem object. creating vector of	       *
 	 *				movies and vector of professionals.						       *
 	 *******************************************************************************/
-	MoviesSystem(Server* server);
+	MoviesSystem();
+public:
+	static MoviesSystem& getInstance();
+	bool occupy();
+	void setServer(Server* serv);
 
+	static
 	/*******************************************************************************
 	 * function name : ~MoviesSystem										       *
 	 * input : nothing														       *

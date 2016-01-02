@@ -12,7 +12,7 @@ TCPServer::TCPServer(int port) :
 	this->createSocket();
 	this->bindSocket();
 	this->connect();
-	this->connEstablish();
+
 }
 
 /*******************************************************************************
