@@ -86,7 +86,7 @@ void MoviesSystem::setServer(Server* serv){
  *******************************************************************************/
 
 void* MoviesSystem::start(void* var) {
-	int* answer=0;
+	int* answer= new int(0);
 	do {
 		*answer = MoviesSystem::getInstance()->getCommand();
 		sleep(1);

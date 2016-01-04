@@ -126,7 +126,7 @@ void* TCPServer::threadFactory(void* var){
 			//error
 		}
 		serv->addThread(ptrd);
-
+		sleep(2);
 	}
 	return NULL;
 }
