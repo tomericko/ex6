@@ -83,11 +83,11 @@ private:
 	 *******************************************************************************/
 	MoviesSystem();
 public:
-	static MoviesSystem& getInstance();
+	static MoviesSystem* getInstance();
 	bool occupy();
 	void setServer(Server* serv);
 
-	static
+
 	/*******************************************************************************
 	 * function name : ~MoviesSystem										       *
 	 * input : nothing														       *
@@ -103,7 +103,7 @@ public:
 	 * explanation : starting the operation of the movies system		  		   *
 	 *				(starting the manu).									       *
 	 *******************************************************************************/
-	void start();
+	void* start(void* var);
 
 	/*******************************************************************************
 	 * function name : setNewMovie											       *

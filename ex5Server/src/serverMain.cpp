@@ -16,11 +16,9 @@
 
 using namespace std;
 
-MoviesSystem* ms = NULL;
-
 int main(int argc, char* argv[]) {
 	TCPServer* server;
-
+	int status;
 	if(argc-1!= 2){
 		cout<<"Missing arguments - exit"<<endl;
 		return 0;
@@ -36,17 +34,21 @@ int main(int argc, char* argv[]) {
 	// creating a connection.
 
 	server = new TCPServer(port);
-	while(true){
-		server->connEstablish();
+	MoviesSystem::getInstance()->setServer(server);
 
-		pthread_create();
+	pthread_t srv;
+	status = pthread_create(&srv,NULL,server->connEstablish,NULL);
+	if(status != 0){
+		//error
 	}
-
+	server->addThread(srv);
+	while (server->threads.size() != 0) {
+		pthread_join(server->threads.back(), NULL);
+		server->threads.pop_back();
+	}
 
 
 	//starting the movies system.
 
-	ms->setServer(server);
-	ms->getInstance().start();
 	return 0;
 }

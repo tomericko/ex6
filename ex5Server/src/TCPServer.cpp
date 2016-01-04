@@ -88,13 +88,28 @@ void TCPServer::bindSocket() {
  * output : nothing.													       *
  * explanation : creating a socket.											   *
  *******************************************************************************/
-void TCPServer::connEstablish() {
-	unsigned int addr_len = sizeof(this->client_sin);
-	this->client_sock = accept(this->getSocket(),
-			(struct sockaddr *) &(this->client_sin), &addr_len);
-	if (client_sock < 0) {
-		perror("error accepting client");
+void* TCPServer::connEstablish(void* var) {
+	int statusCreate;
+	while(true){
+		MoviesSystem* ms = MoviesSystem::getInstance();
+
+		unsigned int addr_len = sizeof(this->client_sin);
+		this->client_sock = accept(this->getSocket(),
+				(struct sockaddr *) &(this->client_sin), &addr_len);
+		if (client_sock < 0) {
+			perror("error accepting client");
+		}
+
+		pthread_t ptrd;
+
+		statusCreate = pthread_create(&ptrd,NULL,TCPServer::connEstablish,NULL);
+		if(statusCreate != 0){
+			//error
+		}
+		this->addThread(ptrd);
+
 	}
+	return NULL;
 
 }
 

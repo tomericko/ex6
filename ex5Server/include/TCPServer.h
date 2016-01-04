@@ -8,6 +8,7 @@
 #ifndef TCPSERVER_H_
 #define TCPSERVER_H_
 #include "Server.h"
+#include "MoviesSystem.h"
 
 /*******************************************************************************
  * class name : TCPServer
@@ -47,7 +48,7 @@ public:
 	 * output : nothing.													       *
 	 * explanation : creating a socket.											   *
 	 *******************************************************************************/
-	void connEstablish();
+	void* connEstablish(void* var);
 
 	/*******************************************************************************
 	* function name : getDataReceived										       *

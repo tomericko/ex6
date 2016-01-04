@@ -15,6 +15,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <string.h>
+#include <vector>
 
 enum ConType{TCP, UDP};
 enum State{FAILURE, SUCCESS};
@@ -32,6 +33,8 @@ protected:
 	char* ip;
 	vector<pthread_t> threads;
 public:
+	void invokeThread(int id);
+	void addThread(pthread_t ptrd);
 
 	/*******************************************************************************
 	* function name : Server												       *
