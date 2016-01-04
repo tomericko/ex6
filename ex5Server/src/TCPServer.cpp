@@ -1,5 +1,8 @@
 #include "TCPServer.h"
 
+TCPServer* serv = NULL;
+bool serverConstruct = false;
+pthread_mutex_t lock = 0;
 /*******************************************************************************
  * function name : TCPServer											       *
  * input : nothing.														       *
@@ -8,6 +11,7 @@
  *******************************************************************************/
 TCPServer::TCPServer(int port) :
 		Server(port) {
+	this->serverConstruct = false;
 	this->client_sock = 0;
 	this->createSocket();
 	this->bindSocket();
@@ -15,6 +19,20 @@ TCPServer::TCPServer(int port) :
 
 }
 
+TCPServer* TCPServer::getServerIns(int port){
+	if(!serverConstruct){
+
+		pthread_mutex_lock(&lock);
+		if(!serverConstruct){
+			TCPServer::serv = new TCPServer(port);
+			serverConstruct = true;
+		}
+		pthread_mutex_unlock(&lock);
+
+	}
+
+	return serv;
+}
 /*******************************************************************************
  * function name : ~TCPServer											       *
  * input : nothing.														       *
@@ -87,12 +105,30 @@ void TCPServer::bindSocket() {
  * explanation : creating a socket.											   *
  *******************************************************************************/
 void TCPServer::connEstablish() {
+
 	unsigned int addr_len = sizeof(this->client_sin);
 	this->client_sock = accept(this->getSocket(),
 			(struct sockaddr *) &(this->client_sin), &addr_len);
 	if (client_sock < 0) {
 		perror("error accepting client");
 	}
+
+}
+
+void* TCPServer::threadFactory(void* var){
+	MoviesSystem* ms = MoviesSystem::getInstance();
+	int statusCreate;
+	while(true){
+		pthread_t ptrd;
+		serv->connEstablish();
+		statusCreate = pthread_create(&ptrd,NULL,ms->start,NULL);
+		if(statusCreate != 0){
+			//error
+		}
+		serv->addThread(ptrd);
+
+	}
+	return NULL;
 }
 
 /*******************************************************************************

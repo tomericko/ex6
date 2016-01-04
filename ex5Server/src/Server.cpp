@@ -13,8 +13,19 @@ Server::Server(){
 	this->dataReceived =NULL;
 	this->sock = 0;
 	this->ip = NULL;
-	this->threads = NULL;
+	this->threads =vector<pthread_t>();
 }
+vector<pthread_t> Server::getThreads(){
+	return this->threads;
+}
+void Server::invokeThread(int id){
+	pthread_join(id,NULL);
+}
+
+void Server::addThread(pthread_t ptrd){
+	this->threads.push_back(ptrd);
+}
+
 
 /*******************************************************************************
 * function name : ~Server												       *

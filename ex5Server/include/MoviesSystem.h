@@ -32,8 +32,9 @@ private:
 	Server* server;
 	static MoviesSystem* instance;
 	static pthread_mutex_t lock;
-	bool inUse;
 	static bool isConstruct;
+	bool inUse;
+
 
 	/*******************************************************************************
 	 * function name : getCommand											       *
@@ -83,11 +84,11 @@ private:
 	 *******************************************************************************/
 	MoviesSystem();
 public:
-	static MoviesSystem& getInstance();
+	static MoviesSystem* getInstance();
 	bool occupy();
 	void setServer(Server* serv);
 
-	static
+
 	/*******************************************************************************
 	 * function name : ~MoviesSystem										       *
 	 * input : nothing														       *
@@ -103,7 +104,7 @@ public:
 	 * explanation : starting the operation of the movies system		  		   *
 	 *				(starting the manu).									       *
 	 *******************************************************************************/
-	void start();
+	static void* start(void* var);
 
 	/*******************************************************************************
 	 * function name : setNewMovie											       *

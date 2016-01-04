@@ -8,6 +8,8 @@
 #include "MoviesSystem.h"
 
 MoviesSystem* MoviesSystem::instance = NULL;
+pthread_mutex_t lock = 0;
+bool isConstruct = false;
 /*******************************************************************************
  * function name : ~MoviesSystem										       *
  * input : nothing														       *
@@ -44,26 +46,24 @@ MoviesSystem::MoviesSystem() {
 	this->professionals = vector<Professional*>();
 	this->types = vector<Type*>();
 	this->inUse = false;
-	this->isConstruct = false;
+
+	isConstruct = false;
 	//this->server = server;
 }
 
-static MoviesSystem& MoviesSystem::getInstance(){
-	if(!this->isConstruct){
+MoviesSystem* MoviesSystem::getInstance(){
+	if(!isConstruct){
 
-		/*if(pthread_mutex_init(&this->lock,NULL)!=0){
-			perror("couldn't initialize lock");
-		}*/
-		//lock
-		if(!this->isConstruct){
+		pthread_mutex_lock(&lock);
+		if(!isConstruct){
 			MoviesSystem::instance = new MoviesSystem();
-			this->isConstruct = true;
+			isConstruct = true;
 		}
-		//unlock
+		pthread_mutex_unlock(&lock);
 
 	}
 
-	return this->instance;
+	return instance;
 }
 
 bool MoviesSystem::occupy(){
@@ -85,11 +85,14 @@ void MoviesSystem::setServer(Server* serv){
  *				(starting the manu).									       *
  *******************************************************************************/
 
-void MoviesSystem::start() {
-	int answer;
+void* MoviesSystem::start(void* var) {
+	int* answer=0;
 	do {
-		answer = this->getCommand();
-	} while (answer);
+		*answer = MoviesSystem::getInstance()->getCommand();
+		sleep(1);
+	} while (*answer);
+
+	return answer;
 }
 /*******************************************************************************
  * function name : getCommand											       *

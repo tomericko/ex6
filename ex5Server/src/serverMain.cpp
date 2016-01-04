@@ -13,14 +13,13 @@
 #include "Server.h"
 #include "UDPServer.h"
 #include "TCPServer.h"
+#include <pthread.h>
 
 using namespace std;
 
-MoviesSystem* ms = NULL;
-
 int main(int argc, char* argv[]) {
 	TCPServer* server;
-
+	int status;
 	if(argc-1!= 2){
 		cout<<"Missing arguments - exit"<<endl;
 		return 0;
@@ -35,18 +34,22 @@ int main(int argc, char* argv[]) {
 
 	// creating a connection.
 
-	server = new TCPServer(port);
-	while(true){
-		server->connEstablish();
+	server = TCPServer::getServerIns(port);
+	MoviesSystem::getInstance()->setServer(server);
 
-		pthread_create();
+	pthread_t srv;
+	status = pthread_create(&srv,NULL,server->threadFactory,NULL);
+	if(status != 0){
+		//error
 	}
-
+	server->addThread(srv);
+	while (server->getServerIns(port)->getThreads().size() != 0) {
+		pthread_join(server->getServerIns(port)->getThreads().back(), NULL);
+		server->getServerIns(port)->getThreads().pop_back();
+	}
 
 
 	//starting the movies system.
 
-	ms->setServer(server);
-	ms->getInstance().start();
 	return 0;
 }
