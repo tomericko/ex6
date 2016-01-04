@@ -13,6 +13,7 @@
 #include "Server.h"
 #include "UDPServer.h"
 #include "TCPServer.h"
+#include <pthread.h>
 
 using namespace std;
 
@@ -33,18 +34,18 @@ int main(int argc, char* argv[]) {
 
 	// creating a connection.
 
-	server = new TCPServer(port);
+	server = TCPServer::getServerIns(port);
 	MoviesSystem::getInstance()->setServer(server);
 
 	pthread_t srv;
-	status = pthread_create(&srv,NULL,server->connEstablish,NULL);
+	status = pthread_create(&srv,NULL,server->threadFactory,NULL);
 	if(status != 0){
 		//error
 	}
 	server->addThread(srv);
-	while (server->threads.size() != 0) {
-		pthread_join(server->threads.back(), NULL);
-		server->threads.pop_back();
+	while (server->getServerIns(port)->getThreads().size() != 0) {
+		pthread_join(server->getServerIns(port)->getThreads().back(), NULL);
+		server->getServerIns(port)->getThreads().pop_back();
 	}
 
 

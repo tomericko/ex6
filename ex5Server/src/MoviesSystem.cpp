@@ -8,6 +8,8 @@
 #include "MoviesSystem.h"
 
 MoviesSystem* MoviesSystem::instance = NULL;
+pthread_mutex_t lock = 0;
+bool isConstruct = false;
 /*******************************************************************************
  * function name : ~MoviesSystem										       *
  * input : nothing														       *
@@ -44,7 +46,8 @@ MoviesSystem::MoviesSystem() {
 	this->professionals = vector<Professional*>();
 	this->types = vector<Type*>();
 	this->inUse = false;
-	this->isConstruct = false;
+
+	isConstruct = false;
 	//this->server = server;
 }
 
@@ -83,12 +86,10 @@ void MoviesSystem::setServer(Server* serv){
  *******************************************************************************/
 
 void* MoviesSystem::start(void* var) {
-	int* answer;
+	int* answer=0;
 	do {
-		//pthread_mutex_lock()
-		*answer = this->getCommand();
+		*answer = MoviesSystem::getInstance()->getCommand();
 		sleep(1);
-		//pthread_mutex_unlock()
 	} while (*answer);
 
 	return answer;

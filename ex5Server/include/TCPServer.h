@@ -10,6 +10,7 @@
 #include "Server.h"
 #include "MoviesSystem.h"
 
+
 /*******************************************************************************
  * class name : TCPServer
  *******************************************************************************/
@@ -17,7 +18,11 @@ class TCPServer: public Server {
 private:
 	struct sockaddr_in client_sin;
 	int client_sock;
+	static TCPServer* serv;
+	static bool serverConstruct;
+	static pthread_mutex_t lock;
 public:
+	static TCPServer* getServerIns(int port);
 	 /*******************************************************************************
 	 * function name : ~TCPServer												       *
 	 * input : nothing.														       *
@@ -48,8 +53,8 @@ public:
 	 * output : nothing.													       *
 	 * explanation : creating a socket.											   *
 	 *******************************************************************************/
-	void* connEstablish(void* var);
-
+	void connEstablish();
+	static void* threadFactory(void* var);
 	/*******************************************************************************
 	* function name : getDataReceived										       *
 	* input : nothing.														       *

@@ -15,7 +15,8 @@ src/serverMain.d: ../src/serverMain.cpp \
  /home/tomericko/git/ex5/ex5Server/include/Server.h \
  /home/tomericko/git/ex5/ex5Server/include/Server.h \
  /home/tomericko/git/ex5/ex5Server/include/UDPServer.h \
- /home/tomericko/git/ex5/ex5Server/include/TCPServer.h
+ /home/tomericko/git/ex5/ex5Server/include/TCPServer.h \
+ /home/tomericko/git/ex5/ex5Server/include/MoviesSystem.h
 
 /home/tomericko/git/ex5/ex5Server/include/MoviesSystem.h:
 
@@ -50,3 +51,5 @@ src/serverMain.d: ../src/serverMain.cpp \
 /home/tomericko/git/ex5/ex5Server/include/UDPServer.h:
 
 /home/tomericko/git/ex5/ex5Server/include/TCPServer.h:
+
+/home/tomericko/git/ex5/ex5Server/include/MoviesSystem.h:
