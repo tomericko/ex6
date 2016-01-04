@@ -1,10 +1,10 @@
 #include "TCPServer.h"
 
 /*******************************************************************************
- * function name : TCPServer												       *
+ * function name : TCPServer											       *
  * input : nothing.														       *
  * output : ip as string.												       *
- * explanation : constructor of a TCPServer.									   *
+ * explanation : constructor of a TCPServer.								   *
  *******************************************************************************/
 TCPServer::TCPServer(int port) :
 		Server(port) {
@@ -22,17 +22,15 @@ TCPServer::TCPServer(int port) :
  * explanation : destructor of a TCPServer.									   *
  *******************************************************************************/
 TCPServer::~TCPServer() {
-
 }
 
 /*******************************************************************************
-* function name : connect												       *
-* input : connect to a certain socket.									       *
-* output : nothing.														       *
-* explanation : sending the data to the socket.								   *
-*******************************************************************************/
+ * function name : connect												       *
+ * input : connect to a certain socket.									       *
+ * output : nothing.														       *
+ * explanation : sending the data to the socket.								   *
+ *******************************************************************************/
 void TCPServer::connect() {
-
 	int back_log = 1; //need to change
 	if (listen(this->getSocket(), back_log) < 0) {
 		perror("error listening to a socket");
@@ -40,11 +38,11 @@ void TCPServer::connect() {
 }
 
 /*******************************************************************************
-* function name : createSocket											       *
-* input : nothing.														       *
-* output : nothing.														       *
-* explanation : creating a socket in this connection.						   *
-*******************************************************************************/
+ * function name : createSocket											       *
+ * input : nothing.														       *
+ * output : nothing.														       *
+ * explanation : creating a socket in this connection.						   *
+ *******************************************************************************/
 void TCPServer::createSocket() {
 	this->sock = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -54,11 +52,11 @@ void TCPServer::createSocket() {
 }
 
 /*******************************************************************************
-* function name : setSocket												       *
-* input : ip address as string and socket as int.						       *
-* output : nothing.														       *
-* explanation : setting the socket.											   *
-*******************************************************************************/
+ * function name : setSocket												       *
+ * input : ip address as string and socket as int.						       *
+ * output : nothing.														       *
+ * explanation : setting the socket.											   *
+ *******************************************************************************/
 void TCPServer::setSocket(char* ip, int sock) {
 	this->sock = sock;
 	this->ip = NULL;
@@ -95,7 +93,6 @@ void TCPServer::connEstablish() {
 	if (client_sock < 0) {
 		perror("error accepting client");
 	}
-
 }
 
 /*******************************************************************************
@@ -106,7 +103,7 @@ void TCPServer::connEstablish() {
  *******************************************************************************/
 void TCPServer::sendData(string data) {
 	int data_len = data.length();
-	if(data_len == 0){
+	if (data_len == 0) {
 		data = "\0";
 		data_len = 1;
 	}
@@ -114,7 +111,6 @@ void TCPServer::sendData(string data) {
 	if (sent_bytes < 0) {
 		perror("error sending to client");
 	}
-
 }
 
 /*******************************************************************************
@@ -124,7 +120,6 @@ void TCPServer::sendData(string data) {
  * explanation : receive the massage to the buffer.							   *
  *******************************************************************************/
 void TCPServer::dataReceiver() {
-
 	char buffer[4096];
 	int expected_data_len = sizeof(buffer);
 	memset(&(buffer), 0, sizeof(buffer));
@@ -135,5 +130,4 @@ void TCPServer::dataReceiver() {
 		perror("error reading from client");
 	}
 	this->dataReceived = buffer;
-
 }
