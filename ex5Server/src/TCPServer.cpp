@@ -1,8 +1,8 @@
 #include "TCPServer.h"
 
-TCPServer* serv = NULL;
-bool serverConstruct = false;
-pthread_mutex_t lock = 0;
+TCPServer* TCPServer::serv;
+bool TCPServer::serverConstruct;
+pthread_mutex_t TCPServer::lock;
 /*******************************************************************************
  * function name : TCPServer											       *
  * input : nothing.														       *
@@ -11,7 +11,7 @@ pthread_mutex_t lock = 0;
  *******************************************************************************/
 TCPServer::TCPServer(int port) :
 		Server(port) {
-	this->serverConstruct = false;
+	serverConstruct = false;
 	this->client_sock = 0;
 	this->createSocket();
 	this->bindSocket();

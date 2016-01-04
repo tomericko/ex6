@@ -7,9 +7,9 @@
 
 #include "MoviesSystem.h"
 
-MoviesSystem* MoviesSystem::instance = NULL;
-pthread_mutex_t lock = 0;
-bool isConstruct = false;
+MoviesSystem* MoviesSystem::instance;
+bool MoviesSystem::isConstruct;
+pthread_mutex_t MoviesSystem::lock;
 /*******************************************************************************
  * function name : ~MoviesSystem										       *
  * input : nothing														       *

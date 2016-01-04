@@ -1,7 +1,7 @@
 src/UdpConnection.d: ../src/UdpConnection.cpp \
- /home/roi/ex4/ex4Client/include/UdpConnection.h \
- /home/roi/ex4/ex4Client/include/ClientConnection.h
+ /home/roi/git/ex5/ex5Client/include/UdpConnection.h \
+ /home/roi/git/ex5/ex5Client/include/ClientConnection.h
 
-/home/roi/ex4/ex4Client/include/UdpConnection.h:
+/home/roi/git/ex5/ex5Client/include/UdpConnection.h:
 
-/home/roi/ex4/ex4Client/include/ClientConnection.h:
+/home/roi/git/ex5/ex5Client/include/ClientConnection.h:
