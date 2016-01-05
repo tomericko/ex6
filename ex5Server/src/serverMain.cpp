@@ -36,18 +36,16 @@ int main(int argc, char* argv[]) {
 
 	server = TCPServer::getServerIns(port);
 	MoviesSystem::getInstance()->setServer(server);
-
+	server->threadFactory(NULL);
+	/*
 	pthread_t srv;
 	status = pthread_create(&srv,NULL,server->threadFactory,NULL);
 	if(status != 0){
 		//error
 	}
-	server->addThread(srv);
-	int size = server->getServerIns(port)->getThreads().size();
-	for (int i = 0; i < size; i++) {
-		pthread_join(server->getServerIns(port)->getThreads().at(i), NULL);
-	}
-
+	//server->addThread(srv);
+	pthread_join(srv, NULL);
+	*/
 
 	//starting the movies system.
 

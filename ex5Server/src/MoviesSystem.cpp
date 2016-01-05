@@ -101,7 +101,7 @@ void* MoviesSystem::start(void* var) {
  * explanation : getting and operating the next command					       *
  *******************************************************************************/
 int MoviesSystem::getCommand() {
-
+	this->server->setSocket(this->server->getThreads()[pthread_self()]);
 	this->server->dataReceiver();
 	string data = this->server->getDataReceived();
 	vector<string> dat = this->split(data," ");

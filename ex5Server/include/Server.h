@@ -16,6 +16,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <vector>
+#include <map>
 
 enum ConType{TCP, UDP};
 enum State{FAILURE, SUCCESS};
@@ -29,9 +30,10 @@ protected:
 	int port;
 	struct sockaddr_in sin;
 	int sock;
+	int client_sock;
 	char* dataReceived;
 	char* ip;
-	vector<pthread_t> threads;
+	map<pthread_t, int> threads;
 
 
 	/*******************************************************************************
@@ -45,7 +47,7 @@ public:
 	void invokeThread(int id);
 	void addThread(pthread_t ptrd);
 	Server(int port);
-	vector<pthread_t> getThreads();
+	map<pthread_t, int>& getThreads();
 
 	/*******************************************************************************
 	* function name : Server												       *

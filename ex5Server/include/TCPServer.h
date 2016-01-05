@@ -17,7 +17,6 @@
 class TCPServer: public Server {
 private:
 	struct sockaddr_in client_sin;
-	int client_sock;
 	static TCPServer* serv;
 	static bool serverConstruct;
 	static pthread_mutex_t lock;

@@ -13,9 +13,9 @@ Server::Server(){
 	this->dataReceived =NULL;
 	this->sock = 0;
 	this->ip = NULL;
-	this->threads =vector<pthread_t>();
+	this->threads = map<pthread_t, int>();
 }
-vector<pthread_t> Server::getThreads(){
+map<pthread_t, int>& Server::getThreads(){
 	return this->threads;
 }
 void Server::invokeThread(int id){
@@ -23,7 +23,7 @@ void Server::invokeThread(int id){
 }
 
 void Server::addThread(pthread_t ptrd){
-	this->threads.push_back(ptrd);
+	this->threads[ptrd] = this->client_sock;
 }
 
 
@@ -88,6 +88,10 @@ void Server::setIP(char*  ip){
 *******************************************************************************/
 void Server::setPort(int port){
 	this->port=port;
+}
+
+void Server::setSocket(int sock){
+	this->client_sock = sock;
 }
 
 /*******************************************************************************

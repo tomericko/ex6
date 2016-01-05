@@ -17,6 +17,7 @@
 #include <iostream>
 #include <algorithm>
 #include <stdlib.h>
+#include <pthread.h>>
 #include "Server.h"
 using namespace std;
 
