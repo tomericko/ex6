@@ -34,9 +34,9 @@ int main(int argc, char* argv[]) {
 
 	// creating a connection.
 
-	server = TCPServer::getServerIns(port);
+	server = new TCPServer(port);
 	MoviesSystem::getInstance()->setServer(server);
-	server->threadFactory(NULL);
+	server->threadFactory();
 	/*
 	pthread_t srv;
 	status = pthread_create(&srv,NULL,server->threadFactory,NULL);

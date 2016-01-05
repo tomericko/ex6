@@ -1,8 +1,5 @@
 #include "TCPServer.h"
 
-TCPServer* TCPServer::serv;
-bool TCPServer::serverConstruct;
-pthread_mutex_t TCPServer::lock;
 /*******************************************************************************
  * function name : TCPServer											       *
  * input : nothing.														       *
@@ -11,7 +8,6 @@ pthread_mutex_t TCPServer::lock;
  *******************************************************************************/
 TCPServer::TCPServer(int port) :
 		Server(port) {
-	serverConstruct = false;
 	this->client_sock = 0;
 	this->createSocket();
 	this->bindSocket();
@@ -19,20 +15,6 @@ TCPServer::TCPServer(int port) :
 
 }
 
-TCPServer* TCPServer::getServerIns(int port){
-	if(!serverConstruct){
-
-		pthread_mutex_lock(&lock);
-		if(!serverConstruct){
-			TCPServer::serv = new TCPServer(port);
-			serverConstruct = true;
-		}
-		pthread_mutex_unlock(&lock);
-
-	}
-
-	return serv;
-}
 /*******************************************************************************
  * function name : ~TCPServer											       *
  * input : nothing.														       *
@@ -115,19 +97,23 @@ void TCPServer::connEstablish() {
 
 }
 
-void* TCPServer::threadFactory(void* var){
+void TCPServer::threadFactory(){
 	MoviesSystem* ms = MoviesSystem::getInstance();
 	int statusCreate;
-	while(true){
+	do{
 		pthread_t ptrd;
-		serv->connEstablish();
-		statusCreate = pthread_create(&ptrd,NULL,ms->start,NULL);
+		unsigned int addr_len = sizeof(this->client_sin);
+		int clientSock = accept(this->getSocket(),
+				(struct sockaddr *) &(this->client_sin), &addr_len);
+		if (client_sock < 0) {
+			perror("error accepting client");
+		}
+		statusCreate = pthread_create(&ptrd,NULL,ms->start,(void*)&clientSock);
 		if(statusCreate != 0){
 			//error
 		}
-		serv->addThread(ptrd);
-	}
-	return NULL;
+		this->addThread(ptrd);
+	} while (this->threads.size() !=0);
 }
 
 /*******************************************************************************
@@ -136,13 +122,13 @@ void* TCPServer::threadFactory(void* var){
  * output : nothing.													       *
  * explanation : sending the data to the socket.							   *
  *******************************************************************************/
-void TCPServer::sendData(string data) {
+void TCPServer::sendData(string data, int sock) {
 	int data_len = data.length();
 	if (data_len == 0) {
 		data = "\0";
 		data_len = 1;
 	}
-	int sent_bytes = send(this->client_sock, data.c_str(), data_len, 0);
+	int sent_bytes = send(sock, data.c_str(), data_len, 0);
 	if (sent_bytes < 0) {
 		perror("error sending to client");
 	}
@@ -154,15 +140,16 @@ void TCPServer::sendData(string data) {
  * output : nothing.													       *
  * explanation : receive the massage to the buffer.							   *
  *******************************************************************************/
-void TCPServer::dataReceiver() {
+string TCPServer::dataReceiver(int sock) {
 	char buffer[4096];
 	int expected_data_len = sizeof(buffer);
 	memset(&(buffer), 0, sizeof(buffer));
-	int read_bytes = recv(this->client_sock, buffer, expected_data_len, 0);
+	int read_bytes = recv(sock, buffer, expected_data_len, 0);
 	if (read_bytes == 0) {
 		cout << "connection is close\n";
 	} else if (read_bytes < 0) {
 		perror("error reading from client");
 	}
 	this->dataReceived = buffer;
+	return buffer;
 }

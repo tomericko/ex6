@@ -17,7 +17,7 @@
 #include <iostream>
 #include <algorithm>
 #include <stdlib.h>
-#include <pthread.h>>
+#include <pthread.h>
 #include "Server.h"
 using namespace std;
 
@@ -43,7 +43,7 @@ private:
 	 * output : nothing.													       *
 	 * explanation : getting and operating the next command					       *
 	 *******************************************************************************/
-	int getCommand();
+	int getCommand(int sock);
 
 	/*******************************************************************************
 	 * function name : split												       *
@@ -114,7 +114,7 @@ public:
 	 * output : nothing.													       *
 	 * explanation : setting new movie object using Movie constructor.		       *
 	 *******************************************************************************/
-	void setNewMovie(string id, string name, int length, int year, float rank,
+	string setNewMovie(string id, string name, int length, int year, float rank,
 			string summary);
 
 	/*******************************************************************************
@@ -124,7 +124,7 @@ public:
 	 * output : nothing.													       *
 	 * explanation : setting new professional object using Professional constructor.*
 	 *************************m******************************************************/
-	void setNewProfessional(int professionalType, int id, int age,
+	string setNewProfessional(int professionalType, int id, int age,
 			string specificDesc, string gender, string name);
 
 	/*******************************************************************************
@@ -134,14 +134,14 @@ public:
 	 * explanation : searching the professional by id and adding it to		       *
 	 *				the movie staff and the movie to the professional movie vector.*
 	 *******************************************************************************/
-	void addProfessionalToMovie(int professionalToAddId, string movieId);
+	string addProfessionalToMovie(int professionalToAddId, string movieId);
 	/*******************************************************************************
 	 * function name : addTypeToMovie										       *
 	 * input : movie type as string  and movie id as int.					       *
 	 * output : nothing.														   *
 	 * explanation : adding type of movie to it's types vector.				       *
 	 *******************************************************************************/
-	void addTypeToMovie(string movieId, string typeToAdd);
+	string addTypeToMovie(string movieId, string typeToAdd);
 
 	/*******************************************************************************
 	 * function name : setSortingTypeMovie									       *
@@ -149,7 +149,7 @@ public:
 	 * output : nothing.													       *
 	 * explanation : setting the sorting type of a movie.					       *
 	 *******************************************************************************/
-	void setSortingTypeMovie(string movieId, int sortingTypeToAdd);
+	string setSortingTypeMovie(string movieId, int sortingTypeToAdd);
 
 	/*******************************************************************************
 	 * function name : printAllProfessionalsOfMovie							       *
@@ -158,7 +158,7 @@ public:
 	 * explanation : searching the movie by it's id and printing all the	       *
 	 *				professionals of the movie.								       *
 	 *******************************************************************************/
-	void printAllProfessionalsOfMovie(string movieId);
+	string printAllProfessionalsOfMovie(string movieId);
 
 	/*******************************************************************************
 	 * function name : printAllMovieDetails									       *
@@ -167,7 +167,7 @@ public:
 	 * explanation : searching the movie by it's id and printing all the	       *
 	 *				the movie details.										       *
 	 *******************************************************************************/
-	void printAllMovieDetails(string movieId);
+	string printAllMovieDetails(string movieId);
 
 	/*******************************************************************************
 	 * function name : mergeMovies											       *
@@ -176,7 +176,7 @@ public:
 	 * explanation : searching the movies by their id, merging all the movies to   *
 	 one movie and adding it to movies vector.								       *
 	 *******************************************************************************/
-	void mergeMovies(vector<string> moviesId);
+	string mergeMovies(vector<string> moviesId);
 
 	/*******************************************************************************
 	 * function name : printAllMoviesOfProfessional							       *
@@ -185,7 +185,7 @@ public:
 	 * explanation : searching the movie by it's id and printing all the		   *
 	 *				professionals of the movie.								       *
 	 *******************************************************************************/
-	void printAllMoviesOfProfessional(int professionalId);
+	string printAllMoviesOfProfessional(int professionalId);
 
 	/*******************************************************************************
 	 * function name : printAllMoviesOfType									       *
@@ -195,7 +195,7 @@ public:
 	 *				movies of the type.											   *
 	 *																		       *
 	 *******************************************************************************/
-	void printAllMoviesOfType(string typeStr);
+	string printAllMoviesOfType(string typeStr);
 
 	/*******************************************************************************
 	 * function name : deleteType											       *
@@ -204,7 +204,7 @@ public:
 	 * explanation : searching the type by it's id and remove it from the types	   *
 	 *				vector and from each types vector of the movie types vector.   *
 	 *******************************************************************************/
-	void deleteType(string type);
+	string deleteType(string type);
 
 	/*******************************************************************************
 	 * function name : deleteMovie											       *
@@ -213,7 +213,7 @@ public:
 	 * explanation : searching the movie by it's id and remove it from the movies  *
 	 *				vector and from each movies vector of the movie staff vector.  *
 	 *******************************************************************************/
-	void deleteMovie(string movieId);
+	string deleteMovie(string movieId);
 
 	/*******************************************************************************
 	 * function name : deleteProfessional									       *
@@ -223,7 +223,7 @@ public:
 	 *				professional vector and from each staff vector of the	       *
 	 *				professional movies vector.								       *
 	 *******************************************************************************/
-	void deleteProfessional(int professionalId);
+	string deleteProfessional(int professionalId);
 
 	/*******************************************************************************
 	 * function name : removeProfessionalFromMovie							       *
@@ -233,7 +233,7 @@ public:
 	 *				from the staff vector and removing the movie from the	       *
 	 *				professional movies vector.								       *
 	 *******************************************************************************/
-	void removeProfessionalFromMovie(int professionalId, string movieId);
+	string removeProfessionalFromMovie(int professionalId, string movieId);
 
 	/*******************************************************************************
 	 * function name : printAllMovies										       *
@@ -241,7 +241,7 @@ public:
 	 * output : nothing.													       *
 	 * explanation : printing all the details of each movie in the movies vector.  *
 	 *******************************************************************************/
-	void printAllMovies();
+	string printAllMovies();
 
 	/*******************************************************************************
 	 * function name : printAllProfessionals								       *
@@ -250,7 +250,7 @@ public:
 	 * explanation : printing all the professional details of each professional	   *
 	 *				in the professionals vector.							       *
 	 *******************************************************************************/
-	void printAllProfessionals();
+	string printAllProfessionals();
 
 	/*******************************************************************************
 	 * function name : getMovies											       *

@@ -13,9 +13,9 @@ Server::Server(){
 	this->dataReceived =NULL;
 	this->sock = 0;
 	this->ip = NULL;
-	this->threads = map<pthread_t, int>();
+	this->threads = vector<pthread_t>();
 }
-map<pthread_t, int>& Server::getThreads(){
+vector<pthread_t>& Server::getThreads(){
 	return this->threads;
 }
 void Server::invokeThread(int id){
@@ -23,7 +23,7 @@ void Server::invokeThread(int id){
 }
 
 void Server::addThread(pthread_t ptrd){
-	this->threads[ptrd] = this->client_sock;
+	this->threads.push_back(ptrd);
 }
 
 
@@ -130,7 +130,7 @@ int Server::getSocket(){
 * output : nothing.														       *
 * explanation : sending the data to the socket.								   *
 *******************************************************************************/
-void Server::sendData(string str){}
+void Server::sendData(string str, int sock){}
 
 /*******************************************************************************
 * function name : dataReceiver											       *
@@ -138,7 +138,7 @@ void Server::sendData(string str){}
 * output : nothing.														       *
 * explanation : receive the massage to the buffer.							   *
 *******************************************************************************/
-void Server::dataReceiver(){}
+string Server::dataReceiver(int sock){}
 
 /*******************************************************************************
 * function name : bindSocket											       *

@@ -33,7 +33,7 @@ protected:
 	int client_sock;
 	char* dataReceived;
 	char* ip;
-	map<pthread_t, int> threads;
+	vector<pthread_t> threads;
 
 
 	/*******************************************************************************
@@ -47,7 +47,7 @@ public:
 	void invokeThread(int id);
 	void addThread(pthread_t ptrd);
 	Server(int port);
-	map<pthread_t, int>& getThreads();
+	vector<pthread_t>& getThreads();
 
 	/*******************************************************************************
 	* function name : Server												       *
@@ -127,7 +127,7 @@ public:
 	* output : nothing.														       *
 	* explanation : sending the data to the socket.								   *
 	*******************************************************************************/
-	virtual void sendData(string str)=0;
+	virtual void sendData(string str, int sock)=0;
 
 	/*******************************************************************************
 	* function name : dataReceiver											       *
@@ -135,7 +135,7 @@ public:
 	* output : nothing.														       *
 	* explanation : receive the massage to the buffer.							   *
 	*******************************************************************************/
-	virtual void dataReceiver()= 0;
+	virtual string dataReceiver(int sock)= 0;
 
 	/*******************************************************************************
 	* function name : bindSocket											       *

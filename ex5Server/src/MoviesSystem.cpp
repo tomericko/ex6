@@ -85,11 +85,11 @@ void MoviesSystem::setServer(Server* serv){
  *				(starting the manu).									       *
  *******************************************************************************/
 
-void* MoviesSystem::start(void* var) {
+void* MoviesSystem::start(void* sock) {
 	int* answer= new int(0);
+	int clientSock = *((int*)sock);
 	do {
-		*answer = MoviesSystem::getInstance()->getCommand();
-		sleep(3);
+		*answer = MoviesSystem::getInstance()->getCommand(clientSock);
 	} while (*answer);
 
 	return answer;
@@ -100,14 +100,12 @@ void* MoviesSystem::start(void* var) {
  * output : nothing.														   *
  * explanation : getting and operating the next command					       *
  *******************************************************************************/
-int MoviesSystem::getCommand() {
-	this->server->setSocket(this->server->getThreads()[pthread_self()]);
-	this->server->dataReceiver();
-	string data = this->server->getDataReceived();
+int MoviesSystem::getCommand(int sock) {
+	string data = this->server->dataReceiver(sock);
 	vector<string> dat = this->split(data," ");
 
 	int key = atoi(dat.at(0).c_str());
-
+	string result;
 	switch (key) {
 	case 1: {
 		string id, name, summary = "";
@@ -125,7 +123,7 @@ int MoviesSystem::getCommand() {
 				summary += " ";
 			}
 		}
-		this->setNewMovie(id, name, length, year, rank, summary);
+		result = this->setNewMovie(id, name, length, year, rank, summary);
 	}
 		break;
 	case 2: {
@@ -143,7 +141,7 @@ int MoviesSystem::getCommand() {
 				name += " ";
 			}
 		}
-		this->setNewProfessional(professionalType, id, age, specificDesc,
+		result = this->setNewProfessional(professionalType, id, age, specificDesc,
 				gender, name);
 	}
 		break;
@@ -152,14 +150,14 @@ int MoviesSystem::getCommand() {
 		int professionalId;
 		movieId = dat.at(1);
 		professionalId = atoi(dat.at(2).c_str());
-		this->addProfessionalToMovie(professionalId, movieId);
+		result = this->addProfessionalToMovie(professionalId, movieId);
 	}
 		break;
 	case 4: {
 		string movieId, typeStr;
 		movieId = dat.at(1);
 		typeStr = dat.at(2);
-		this->addTypeToMovie(movieId, typeStr);
+		result = this->addTypeToMovie(movieId, typeStr);
 	}
 		break;
 	case 5: {
@@ -167,43 +165,43 @@ int MoviesSystem::getCommand() {
 		int sortingType;
 		movieId = dat.at(1);
 		sortingType = atoi(dat.at(2).c_str());
-		this->setSortingTypeMovie(movieId, sortingType);
+		result = this->setSortingTypeMovie(movieId, sortingType);
 	}
 		break;
 	case 6: {
 		string movieId;
 		movieId = dat.at(1);
-		this->printAllProfessionalsOfMovie(movieId);
+		result = this->printAllProfessionalsOfMovie(movieId);
 	}
 		break;
 	case 7: {
 		string movieId;
 		movieId = dat.at(1);
-		this->printAllMovieDetails(movieId);
+		result = this->printAllMovieDetails(movieId);
 	}
 		break;
 	case 8: {
 		string line = dat.at(1);
 		vector<string> moviesId = this->split(line, ",");
-		this->mergeMovies(moviesId);
+		result = this->mergeMovies(moviesId);
 	}
 		break;
 	case 9: {
 		int professionalId;
 		professionalId = atoi(dat.at(1).c_str());
-		this->printAllMoviesOfProfessional(professionalId);
+		result = this->printAllMoviesOfProfessional(professionalId);
 	}
 		break;
 	case 10: {
 		string movieId;
 		movieId = dat.at(1);
-		this->deleteMovie(movieId);
+		result = this->deleteMovie(movieId);
 	}
 		break;
 	case 11: {
 		int professionalId;
 		professionalId = atoi(dat.at(1).c_str());
-		this->deleteProfessional(professionalId);
+		result = this->deleteProfessional(professionalId);
 	}
 		break;
 	case 12: {
@@ -211,28 +209,29 @@ int MoviesSystem::getCommand() {
 		int professionalId;
 		movieId = dat.at(1);
 		professionalId = atoi(dat.at(2).c_str());
-		this->removeProfessionalFromMovie(professionalId, movieId);
+		result = this->removeProfessionalFromMovie(professionalId, movieId);
 	}
 		break;
 	case 13: {
-		this->printAllMovies();
+		result = this->printAllMovies();
 	}
 		break;
 	case 14: {
-		this->printAllProfessionals();
+		result = this->printAllProfessionals();
 	}
 		break;
 	case 15: {
 		string typeStr;
 		typeStr = dat.at(1);
-		this->printAllMoviesOfType(typeStr);
+		result = this->printAllMoviesOfType(typeStr);
 	}
 		break;
 	default:
-		this->server->sendData("-1");
+		this->server->sendData("-1", sock);
 		return 0;
 		break;
 	}
+	this->server->sendData(result, sock);
 	return 1;
 }
 
@@ -244,18 +243,18 @@ int MoviesSystem::getCommand() {
  * explanation : setting new movie object using Movie constructor.		       *
  *******************************************************************************/
 
-void MoviesSystem::setNewMovie(string id, string name, int length, int year,
+string MoviesSystem::setNewMovie(string id, string name, int length, int year,
 		float rank, string summary) {
-	string result = "";
+	string resultToSend = "";
 	if ((this->findMovie(id) == NULL)
 			&& (this->isMovieInputValid(length, year, rank))) {
 		Movie* movieToAdd = new Movie(id, name, length, year, rank, summary);
 		this->movies.push_back(movieToAdd);
-		result += "Success\n";
+		resultToSend += "Success\n";
 	} else {
-		result += "Failure\n";
+		resultToSend += "Failure\n";
 	}
-	this->server->sendData(result);
+	return resultToSend;
 }
 
 /*******************************************************************************
@@ -266,7 +265,7 @@ void MoviesSystem::setNewMovie(string id, string name, int length, int year,
  * explanation : set new professional object using Professional constructor.   *
  *************************m******************************************************/
 
-void MoviesSystem::setNewProfessional(int professionalType, int id, int age,
+string MoviesSystem::setNewProfessional(int professionalType, int id, int age,
 		string specificDesc, string gender, string name) {
 	string result = "";
 	Professional* professionalToAdd;
@@ -306,7 +305,7 @@ void MoviesSystem::setNewProfessional(int professionalType, int id, int age,
 		result += "Failure\n";
 	}
 	string resultToSend = result.c_str();
-	this->server->sendData(resultToSend);
+	return resultToSend;
 }
 
 /*******************************************************************************
@@ -317,7 +316,7 @@ void MoviesSystem::setNewProfessional(int professionalType, int id, int age,
  *				the movie staff and the movie to the professional movie vector.*
  *******************************************************************************/
 
-void MoviesSystem::addProfessionalToMovie(int professionalToAddId,
+string MoviesSystem::addProfessionalToMovie(int professionalToAddId,
 		string movieId) {
 	string result = "";
 	Movie* movie = this->findMovie(movieId);
@@ -330,7 +329,7 @@ void MoviesSystem::addProfessionalToMovie(int professionalToAddId,
 		result += "Failure\n";
 	}
 	string resultToSend = result.c_str();
-	this->server->sendData(resultToSend);
+	return resultToSend;
 }
 
 /*******************************************************************************
@@ -340,7 +339,7 @@ void MoviesSystem::addProfessionalToMovie(int professionalToAddId,
  * explanation : adding type of movie to it's types vector.				       *
  *******************************************************************************/
 
-void MoviesSystem::addTypeToMovie(string movieId, string typeToAddStr) {
+string MoviesSystem::addTypeToMovie(string movieId, string typeToAddStr) {
 	string result = "";
 	Movie* movie = this->findMovie(movieId);
 	Type* type = this->findType(typeToAddStr);
@@ -355,7 +354,7 @@ void MoviesSystem::addTypeToMovie(string movieId, string typeToAddStr) {
 		result += "Failure\n";
 	}
 	string resultToSend = result.c_str();
-	this->server->sendData(resultToSend);
+	return resultToSend;
 }
 
 /*******************************************************************************
@@ -365,7 +364,7 @@ void MoviesSystem::addTypeToMovie(string movieId, string typeToAddStr) {
  * explanation : setting the sorting type of a movie.					       *
  *******************************************************************************/
 
-void MoviesSystem::setSortingTypeMovie(string movieId, int sortingTypeToAdd) {
+string MoviesSystem::setSortingTypeMovie(string movieId, int sortingTypeToAdd) {
 	string result = "";
 	if (this->isSortingTypeValid(sortingTypeToAdd)) {
 		Movie* movie = this->findMovie(movieId);
@@ -375,7 +374,7 @@ void MoviesSystem::setSortingTypeMovie(string movieId, int sortingTypeToAdd) {
 		result += "Failure\n";
 	}
 	string resultToSend = result.c_str();
-	this->server->sendData(resultToSend);
+	return resultToSend;
 }
 
 /*******************************************************************************
@@ -386,7 +385,7 @@ void MoviesSystem::setSortingTypeMovie(string movieId, int sortingTypeToAdd) {
  *				professionals of the movie.								       *
  *******************************************************************************/
 
-void MoviesSystem::printAllProfessionalsOfMovie(string movieId) {
+string MoviesSystem::printAllProfessionalsOfMovie(string movieId) {
 	string result = "";
 	Movie* movie = this->findMovie(movieId);
 	if (movie != NULL) {
@@ -398,7 +397,7 @@ void MoviesSystem::printAllProfessionalsOfMovie(string movieId) {
 		result += "Failure\n";
 	}
 	string resultToSend = result.c_str();
-	this->server->sendData(resultToSend);
+	return resultToSend;
 }
 
 /*******************************************************************************
@@ -409,7 +408,7 @@ void MoviesSystem::printAllProfessionalsOfMovie(string movieId) {
  *				the movie details.										       *
  *******************************************************************************/
 
-void MoviesSystem::printAllMovieDetails(string movieId) {
+string MoviesSystem::printAllMovieDetails(string movieId) {
 	string result = "";
 	Movie* movie = this->findMovie(movieId);
 	if (movie != NULL) {
@@ -418,7 +417,7 @@ void MoviesSystem::printAllMovieDetails(string movieId) {
 		result += "Failure\n";
 	}
 	string resultToSend = result.c_str();
-	this->server->sendData(resultToSend);
+	return resultToSend;
 }
 
 /*******************************************************************************
@@ -429,7 +428,7 @@ void MoviesSystem::printAllMovieDetails(string movieId) {
  one movie and adding it to movies vector.								       *
  *******************************************************************************/
 
-void MoviesSystem::mergeMovies(vector<string> moviesId) {
+string MoviesSystem::mergeMovies(vector<string> moviesId) {
 	string result = "";
 	for (vector<string>::iterator it = moviesId.begin(); it != moviesId.end();
 			) {
@@ -472,7 +471,7 @@ void MoviesSystem::mergeMovies(vector<string> moviesId) {
 		result += "Failure\n";
 	}
 	string resultToSend = result.c_str();
-	this->server->sendData(resultToSend);
+	return resultToSend;
 }
 
 /*******************************************************************************
@@ -484,7 +483,7 @@ void MoviesSystem::mergeMovies(vector<string> moviesId) {
  *																		       *
  *******************************************************************************/
 
-void MoviesSystem::printAllMoviesOfProfessional(int professionalId) {
+string MoviesSystem::printAllMoviesOfProfessional(int professionalId) {
 	string result = "";
 	Professional* professional = this->findProfessional(professionalId);
 	if (professional != NULL) {
@@ -496,7 +495,7 @@ void MoviesSystem::printAllMoviesOfProfessional(int professionalId) {
 		result += "Failure\n";
 	}
 	string resultToSend = result.c_str();
-	this->server->sendData(resultToSend);
+	return resultToSend;
 }
 
 /*******************************************************************************
@@ -508,7 +507,7 @@ void MoviesSystem::printAllMoviesOfProfessional(int professionalId) {
  *																		       *
  *******************************************************************************/
 
-void MoviesSystem::printAllMoviesOfType(string typeStr) {
+string MoviesSystem::printAllMoviesOfType(string typeStr) {
 	string result = "";
 	Type* type = this->findType(typeStr);
 	if (type != NULL) {
@@ -520,7 +519,7 @@ void MoviesSystem::printAllMoviesOfType(string typeStr) {
 		result += "Failure\n";
 	}
 	string resultToSend = result.c_str();
-	this->server->sendData(resultToSend);
+	return resultToSend;
 }
 
 /*******************************************************************************
@@ -531,7 +530,7 @@ void MoviesSystem::printAllMoviesOfType(string typeStr) {
  *				vector and from each types vector of the movie types vector.   *
  *******************************************************************************/
 
-void MoviesSystem::deleteType(string typeStr) {
+string MoviesSystem::deleteType(string typeStr) {
 	string result = "";
 	if (this->findType(typeStr) != NULL) {
 		for (vector<Type*>::iterator it = this->types.begin();
@@ -551,7 +550,7 @@ void MoviesSystem::deleteType(string typeStr) {
 		result += "Failure\n";
 	}
 	string resultToSend = result.c_str();
-	this->server->sendData(resultToSend);
+	return resultToSend;
 }
 
 /*******************************************************************************
@@ -562,7 +561,7 @@ void MoviesSystem::deleteType(string typeStr) {
  *				vector and from each movies vector of the movie staff vector.  *
  *******************************************************************************/
 
-void MoviesSystem::deleteMovie(string movieId) {
+string MoviesSystem::deleteMovie(string movieId) {
 	string result = "";
 	if (this->findMovie(movieId) != NULL) {
 		for (vector<Movie*>::iterator it = this->movies.begin();
@@ -587,7 +586,7 @@ void MoviesSystem::deleteMovie(string movieId) {
 		result += "Failure\n";
 	}
 	string resultToSend = result.c_str();
-	this->server->sendData(resultToSend);
+	return resultToSend;
 }
 
 /*******************************************************************************
@@ -599,7 +598,7 @@ void MoviesSystem::deleteMovie(string movieId) {
  *				professional movies vector.								       *
  *******************************************************************************/
 
-void MoviesSystem::deleteProfessional(int professionalId) {
+string MoviesSystem::deleteProfessional(int professionalId) {
 	string result = "";
 	if (this->findProfessional(professionalId) != NULL) {
 		for (vector<Professional*>::iterator it = this->professionals.begin();
@@ -624,7 +623,7 @@ void MoviesSystem::deleteProfessional(int professionalId) {
 		result += "Failure\n";
 	}
 	string resultToSend = result.c_str();
-	this->server->sendData(resultToSend);
+	return resultToSend;
 }
 
 /*******************************************************************************
@@ -636,7 +635,7 @@ void MoviesSystem::deleteProfessional(int professionalId) {
  *				professional movies vector.								       *
  *******************************************************************************/
 
-void MoviesSystem::removeProfessionalFromMovie(int professionalId,
+string MoviesSystem::removeProfessionalFromMovie(int professionalId,
 		string movieId) {
 	string result = "";
 	Movie* movie = this->findMovie(movieId);
@@ -650,7 +649,7 @@ void MoviesSystem::removeProfessionalFromMovie(int professionalId,
 		result += "Failure\n";
 	}
 	string resultToSend = result.c_str();
-	this->server->sendData(resultToSend);
+	return resultToSend;
 }
 
 /*******************************************************************************
@@ -660,7 +659,7 @@ void MoviesSystem::removeProfessionalFromMovie(int professionalId,
  * explanation : printing all the details of each movie in the movies vector.  *
  *******************************************************************************/
 
-void MoviesSystem::printAllMovies() {
+string MoviesSystem::printAllMovies() {
 	string result = "";
 	if (this->movies.size() > 0) {
 		for (vector<Movie*>::iterator it = this->movies.begin();
@@ -669,7 +668,7 @@ void MoviesSystem::printAllMovies() {
 		}
 	}
 	string resultToSend = result.c_str();
-	this->server->sendData(resultToSend);
+	return resultToSend;
 }
 
 /*******************************************************************************
@@ -680,7 +679,7 @@ void MoviesSystem::printAllMovies() {
  *				in the professionals vector.							       *
  *******************************************************************************/
 
-void MoviesSystem::printAllProfessionals() {
+string MoviesSystem::printAllProfessionals() {
 	string result = "";
 	unsigned int size = this->professionals.size();
 	if (size > 0) {
@@ -690,7 +689,7 @@ void MoviesSystem::printAllProfessionals() {
 		}
 	}
 	string resultToSend = result.c_str();
-	this->server->sendData(resultToSend);
+	return resultToSend;
 }
 
 /*******************************************************************************
