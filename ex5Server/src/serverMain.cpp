@@ -32,22 +32,10 @@ int main(int argc, char* argv[]) {
 		return 0;
 	}
 
-	// creating a connection.
-
+	// creating a connection (TCP).
 	server = new TCPServer(port);
 	MoviesSystem::getInstance()->setServer(server);
 	server->threadFactory();
-	/*
-	pthread_t srv;
-	status = pthread_create(&srv,NULL,server->threadFactory,NULL);
-	if(status != 0){
-		//error
-	}
-	//server->addThread(srv);
-	pthread_join(srv, NULL);
-	*/
-
-	//starting the movies system.
 
 	return 0;
 }

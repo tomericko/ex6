@@ -15,13 +15,30 @@ Server::Server(){
 	this->ip = NULL;
 	this->threads = vector<pthread_t>();
 }
+/*******************************************************************************
+* function name : getThreads												       *
+* input : nothing.														       *
+* output : a referance to the vector of the threads.														       *
+* explanation : getter to the vector of threads.									   *
+*******************************************************************************/
 vector<pthread_t>& Server::getThreads(){
 	return this->threads;
 }
+/*******************************************************************************
+* function name : invokeThread												       *
+* input : thread id as int.														       *
+* output : nothing.														       *
+* explanation : invoke the thread with the given id.									   *
+*******************************************************************************/
 void Server::invokeThread(int id){
 	pthread_join(id,NULL);
 }
-
+/*******************************************************************************
+* function name : addThread												       *
+* input : a thread as thread_t.														       *
+* output : nothing.														       *
+* explanation : setter to the threads vector.									   *
+*******************************************************************************/
 void Server::addThread(pthread_t ptrd){
 	this->threads.push_back(ptrd);
 }
@@ -89,7 +106,12 @@ void Server::setIP(char*  ip){
 void Server::setPort(int port){
 	this->port=port;
 }
-
+/*******************************************************************************
+* function name : setSocket												       *
+* input :socket as int.													       *
+* output : nothing.														       *
+* explanation : set the client set currently need.								   *
+*******************************************************************************/
 void Server::setSocket(int sock){
 	this->client_sock = sock;
 }

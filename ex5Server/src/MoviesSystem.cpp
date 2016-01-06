@@ -7,6 +7,7 @@
 
 #include "MoviesSystem.h"
 
+//static members for the instance.
 MoviesSystem* MoviesSystem::instance;
 bool MoviesSystem::isConstruct;
 pthread_mutex_t MoviesSystem::lock;
@@ -46,11 +47,19 @@ MoviesSystem::MoviesSystem() {
 	this->professionals = vector<Professional*>();
 	this->types = vector<Type*>();
 	this->inUse = false;
-
 	isConstruct = false;
-	//this->server = server;
 }
 
+/*******************************************************************************
+ * function name : getInstance											       *
+ * input : nothing.														       *
+ * output : an instance of the MoviesSystem.													       *
+ * explanation : the constructor of this class changed to be private,
+ * 				there for we need to give an access to the MoviesSystem,
+ * 				this function does it. If not constructed already, construct
+ * 				it and return it, else, return the existing one,
+ * 				where just one client can access per request.				       *
+ *******************************************************************************/
 MoviesSystem* MoviesSystem::getInstance(){
 	if(!isConstruct){
 
@@ -66,6 +75,13 @@ MoviesSystem* MoviesSystem::getInstance(){
 	return instance;
 }
 
+/*******************************************************************************
+ * function name : occupy											       *
+ * input : nothing.														       *
+ * output : true if occupy, else false.													       *
+ * explanation : use this function to know if someone currently use
+ * 				the instance of MoviesSystem.
+ *******************************************************************************/
 bool MoviesSystem::occupy(){
 	if(!this->inUse){
 		this->inUse = true;
@@ -73,13 +89,18 @@ bool MoviesSystem::occupy(){
 	}
 	return false;
 }
-
+/*******************************************************************************
+ * function name : setServer											       *
+ * input : pointer to a server.														       *
+ * output : nothing.													       *
+ * explanation : setter for the member server.
+ *******************************************************************************/
 void MoviesSystem::setServer(Server* serv){
 		this->server = serv;
 	}
 /*******************************************************************************
  * function name : start												       *
- * input : nothing.														       *
+ * input : socket to work with.														       *
  * output : nothing.													       *
  * explanation : starting the operation of the movies system		  		   *
  *				(starting the manu).									       *
@@ -96,7 +117,7 @@ void* MoviesSystem::start(void* sock) {
 }
 /*******************************************************************************
  * function name : getCommand											       *
- * input : nothing.														       *
+ * input : socket as int.														       *
  * output : nothing.														   *
  * explanation : getting and operating the next command					       *
  *******************************************************************************/

@@ -2,7 +2,7 @@
 
 /*******************************************************************************
  * function name : TCPServer											       *
- * input : nothing.														       *
+ * input : port number as integer.														       *
  * output : ip as string.												       *
  * explanation : constructor of a TCPServer.								   *
  *******************************************************************************/
@@ -97,9 +97,16 @@ void TCPServer::connEstablish() {
 
 }
 
+/*******************************************************************************
+ * function name : threadFactory										       *
+ * input : nothing.														       *
+ * output : nothing.													       *
+ * explanation : looping to accept new connections - listening.											   *
+ *******************************************************************************/
 void TCPServer::threadFactory(){
 	MoviesSystem* ms = MoviesSystem::getInstance();
 	int statusCreate;
+	//the loop
 	do{
 		pthread_t ptrd;
 		unsigned int addr_len = sizeof(this->client_sin);
@@ -108,11 +115,13 @@ void TCPServer::threadFactory(){
 		if (client_sock < 0) {
 			perror("error accepting client");
 		}
+		//create a new thread.
 		statusCreate = pthread_create(&ptrd,NULL,ms->start,(void*)&clientSock);
 		if(statusCreate != 0){
-			//error
+			perror("Error creating new thread\n");
 		}
 		this->addThread(ptrd);
+		//exit if there is no more threads.
 	} while (this->threads.size() !=0);
 }
 
